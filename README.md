@@ -123,6 +123,9 @@ Keeps track of changes to the status of an order.
 - `order_status_id` (INT): Foreign key linking to the **order_status** table.
 - `update_timestamp` (TIMESTAMP): The time the status change was recorded.
 
+## Entity Relationship Diagram (ERD)
+![Bookstore ERD](bookstore.drawio.png )
+
 ## Security
 
 Roles and permissions have been created to manage access securely:
