@@ -129,3 +129,18 @@ CREATE TABLE order_history (
     FOREIGN KEY (order_id) REFERENCES cust_order(order_id),
     FOREIGN KEY (order_status_id) REFERENCES order_status(order_status_id)
 );
+
+-- Create a user for bookstore staff
+CREATE USER 'bookstore_staff'@'localhost' IDENTIFIED BY 'staff_password';
+
+-- Create a user for bookstore admin
+CREATE USER 'bookstore_admin'@'localhost' IDENTIFIED BY 'admin_password';
+
+-- Grant read-only access to staff (SELECT on all tables)
+GRANT SELECT ON bookstore_db.* TO 'bookstore_staff'@'localhost';
+
+-- Grant full privileges to admin
+GRANT ALL PRIVILEGES ON bookstore_db.* TO 'bookstore_admin'@'localhost';
+
+-- Apply the changes
+FLUSH PRIVILEGES;
