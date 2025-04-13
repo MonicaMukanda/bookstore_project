@@ -130,25 +130,88 @@ CREATE TABLE order_history (
     FOREIGN KEY (order_status_id) REFERENCES order_status(order_status_id)
 );
 
--- Querrying database to extract meangful insights--
-SELECT b.title, SUM(ol.quantity) AS total_orders
-FROM book b
-JOIN order_line ol ON b.book_id = ol.book_id
-GROUP BY b.book_id
-ORDER BY total_orders DESC;
 
--- Create a user for bookstore staff
+-- DATABASE ACCESS MANAGEMENT
+
+-- Create user with read-only access
 CREATE USER 'bookstore_staff'@'localhost' IDENTIFIED BY 'staff_password';
 
--- Create a user for bookstore admin
+-- Create admin user with full access
 CREATE USER 'bookstore_admin'@'localhost' IDENTIFIED BY 'admin_password';
 
--- Grant read-only access to staff (SELECT on all tables)
+-- Grant SELECT only to staff
 GRANT SELECT ON bookstore_db.* TO 'bookstore_staff'@'localhost';
 
 -- Grant full privileges to admin
 GRANT ALL PRIVILEGES ON bookstore_db.* TO 'bookstore_admin'@'localhost';
 
--- Apply the changes
+-- Save the changes
 FLUSH PRIVILEGES;
 
+
+-- QUERYING FOR INSIGHTS
+
+
+-- 1. Top 5 best-selling books
+SELECT 
+    b.title,
+    SUM(ol.quantity) AS total_sold
+FROM 
+    order_line ol
+JOIN 
+    book b ON ol.book_id = b.book_id
+GROUP BY 
+    b.title
+ORDER BY 
+    total_sold DESC
+LIMIT 5;
+
+-- 2. Total revenue per book
+SELECT 
+    b.title,
+    SUM(ol.quantity * ol.price) AS total_revenue
+FROM 
+    order_line ol
+JOIN 
+    book b ON ol.book_id = b.book_id
+GROUP BY 
+    b.title
+ORDER BY 
+    total_revenue DESC;
+
+-- 3. Most frequent customers
+SELECT 
+    c.first_name, 
+    c.last_name, 
+    COUNT(o.order_id) AS total_orders
+FROM 
+    customer c
+JOIN 
+    cust_order o ON c.customer_id = o.customer_id
+GROUP BY 
+    c.customer_id
+ORDER BY 
+    total_orders DESC
+LIMIT 5;
+
+-- 4. Orders by status
+SELECT 
+    os.status_name, 
+    COUNT(co.order_id) AS total_orders
+FROM 
+    cust_order co
+JOIN 
+    order_status os ON co.order_status_id = os.order_status_id
+GROUP BY 
+    os.status_name;
+
+-- 5. Book count per publisher
+SELECT 
+    p.publisher_name, 
+    COUNT(b.book_id) AS total_books
+FROM 
+    publisher p
+JOIN 
+    book b ON p.publisher_id = b.publisher_id
+GROUP BY 
+    p.publisher_name;
