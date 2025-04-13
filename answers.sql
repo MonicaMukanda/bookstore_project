@@ -130,6 +130,13 @@ CREATE TABLE order_history (
     FOREIGN KEY (order_status_id) REFERENCES order_status(order_status_id)
 );
 
+-- Querrying database to extract meangful insights--
+SELECT b.title, SUM(ol.quantity) AS total_orders
+FROM book b
+JOIN order_line ol ON b.book_id = ol.book_id
+GROUP BY b.book_id
+ORDER BY total_orders DESC;
+
 -- Create a user for bookstore staff
 CREATE USER 'bookstore_staff'@'localhost' IDENTIFIED BY 'staff_password';
 
@@ -144,3 +151,4 @@ GRANT ALL PRIVILEGES ON bookstore_db.* TO 'bookstore_admin'@'localhost';
 
 -- Apply the changes
 FLUSH PRIVILEGES;
+
